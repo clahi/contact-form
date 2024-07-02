@@ -12,46 +12,6 @@ resource "aws_api_gateway_resource" "home" {
 
 }
 
-# resource "aws_api_gateway_method" "get" {
-#   rest_api_id   = aws_api_gateway_rest_api.ContactFormApi.id
-#   resource_id   = aws_api_gateway_resource.home.id
-#   http_method   = "GET"
-#   authorization = "NONE"
-# }
-
-# resource "aws_api_gateway_method_response" "get" {
-#   rest_api_id = aws_api_gateway_rest_api.ContactFormApi.id
-#   resource_id = aws_api_gateway_resource.home.id
-#   http_method = aws_api_gateway_method.get.http_method
-#   status_code = "200"
-
-#    response_models = {
-#     "application/json" = "Empty"
-#   }
-# }
-
-# resource "aws_api_gateway_integration" "lambda_integration" {
-#   rest_api_id             = aws_api_gateway_rest_api.ContactFormApi.id
-#   resource_id             = aws_api_gateway_resource.home.id
-#   http_method             = aws_api_gateway_method.get.http_method
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.lambda.invoke_arn
-
-# }
-
-# resource "aws_api_gateway_integration_response" "get" {
-#   rest_api_id = aws_api_gateway_rest_api.ContactFormApi.id
-#   resource_id = aws_api_gateway_resource.home.id
-#   http_method = aws_api_gateway_method.get.http_method
-#   status_code = aws_api_gateway_method_response.get.status_code
-
-#   depends_on = [
-#     aws_api_gateway_method.get,
-#     aws_api_gateway_integration.lambda_integration
-#   ]
-# }
-
 resource "aws_api_gateway_method" "post" {
   rest_api_id   = aws_api_gateway_rest_api.ContactFormApi.id
   resource_id   = aws_api_gateway_resource.home.id
@@ -76,7 +36,7 @@ resource "aws_api_gateway_integration" "lambda_integration_post" {
   http_method             = aws_api_gateway_method.post.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda.invoke_arn
+  uri                     = aws_lambda_function.lambdaRoleforSES.invoke_arn
 
 }
 
@@ -144,6 +104,7 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
 
   depends_on = [
     aws_api_gateway_method.options,
+    aws_api_gateway_method_response.post,
     aws_api_gateway_integration.options_integration,
   ]
 }

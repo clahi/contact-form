@@ -1,5 +1,5 @@
-resource "aws_iam_role" "lambdaRole" {
-  name = "lambdaRole"
+resource "aws_iam_role" "lambdaRoleforSES" {
+  name = "lambdaRoleforSES"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17"
     "Statement" : [
@@ -18,8 +18,8 @@ resource "aws_iam_role" "lambdaRole" {
   })
 }
 
-resource "aws_iam_policy" "lambdaPolicy" {
-  name = "lambdaPolicy"
+resource "aws_iam_policy" "lambdaPolicyForSES" {
+  name = "lambdaPolicyForSES"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
@@ -50,8 +50,8 @@ resource "aws_iam_policy" "lambdaPolicy" {
 }
 
 resource "aws_iam_policy_attachment" "lambdaRolePolicyAttachment" {
-  policy_arn = aws_iam_policy.lambdaPolicy.arn
-  roles      = [aws_iam_role.lambdaRole.name]
+  policy_arn = aws_iam_policy.lambdaPolicyForSES.arn
+  roles      = [aws_iam_role.lambdaRoleforSES.name]
   name       = "lambdaRolePolicyAttachment"
 }
 
@@ -61,11 +61,11 @@ data "archive_file" "lambdaFile" {
   output_path = "${path.module}/lambda.zip"
 }
 
-resource "aws_lambda_function" "lambda" {
-  role             = aws_iam_role.lambdaRole.arn
+resource "aws_lambda_function" "lambdaRoleforSES" {
+  role             = aws_iam_role.lambdaRoleforSES.arn
   filename         = data.archive_file.lambdaFile.output_path
   source_code_hash = data.archive_file.lambdaFile.output_base64sha256
-  function_name    = "lambda"
+  function_name    = "lambdaRoleforSES"
   timeout          = 60
   runtime          = "python3.9"
   handler          = "lambda.lambda_handler"
@@ -73,7 +73,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       DYNAMODB_TABLE = aws_dynamodb_table.basic-dynamodb-table.name
-      SENDER_EMAIL = aws_ses_email_identity.approved_email.email
+      SENDER_EMAIL = "aws_ses_email_identity.approved_email.email"
     }
   }
 }
@@ -81,7 +81,7 @@ resource "aws_lambda_function" "lambda" {
 resource "aws_lambda_permission" "lambdaPermission" {
   statement_id  = "lambdaPermission"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda.function_name
+  function_name = aws_lambda_function.lambdaRoleforSES.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn = "${aws_api_gateway_rest_api.ContactFormApi.execution_arn}/*"
 }

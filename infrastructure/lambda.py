@@ -13,7 +13,7 @@ SES_REGION = 'us-east-1'
 
 
 dynamodb = boto3.resource('dynamodb')
-ses = boto3.client('ses', region_name=SES_REGION)
+ses = boto3.client('ses')
 
 
 def lambda_handler(event, context):
