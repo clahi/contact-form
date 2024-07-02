@@ -1,5 +1,5 @@
 // Set 'URL' to your API Gateway endpoint
-URL = 'https://gf9b25rpq6.execute-api.us-east-1.amazonaws.com/prod/home';
+URL = 'https://bbc0iiq255.execute-api.us-east-1.amazonaws.com/prod/home';
 
 $(document).ready(function () {
 
@@ -18,8 +18,6 @@ $(document).ready(function () {
             phone = $("#phone").val(),
             budget = $("#budget").val(),
             message = $("#message").val();
-
-            console.log('the first name',first_name)
 
         $.ajax({
             type: "POST",

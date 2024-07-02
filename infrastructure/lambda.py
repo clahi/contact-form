@@ -17,17 +17,6 @@ ses = boto3.client('ses')
 
 
 def lambda_handler(event, context):
-    # print('When there is nothing', event['httpMethod'])
-    # return {
-    #     "statusCode": 200,
-    #     "headers": {
-    #         'Access-Control-Allow-Methods': "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-    #         'Access-Control-Allow-Headers': "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    #         'Access-Control-Allow-Origin': "'*'",
-    #         # "Content-Type": "application/json"
-    #         },
-    #     "body": str({"id": "hellow world"})
-    # }
     print(event)
     data = json.loads(event['body'])
     print(json.dumps(data))
@@ -61,9 +50,9 @@ def lambda_handler(event, context):
             'Access-Control-Allow-Methods': "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
             'Access-Control-Allow-Headers': "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
             'Access-Control-Allow-Origin': "*",
-            # "Content-Type": "application/json"
+            "Content-Type": "application/json"
         },
-        "body": ""
+        "body": str({"response": "Success"})
     }
 
 

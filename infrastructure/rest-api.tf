@@ -25,7 +25,7 @@ resource "aws_api_gateway_method_response" "post" {
   http_method = aws_api_gateway_method.post.http_method
   status_code = "200"
 
-   response_models = {
+  response_models = {
     "application/json" = "Empty"
   }
 }
@@ -36,7 +36,7 @@ resource "aws_api_gateway_integration" "lambda_integration_post" {
   http_method             = aws_api_gateway_method.post.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambdaRoleforSES.invoke_arn
+  uri                     = aws_lambda_function.lambdaforSES.invoke_arn
 
 }
 
@@ -126,6 +126,6 @@ resource "aws_api_gateway_deployment" "deploymet" {
     aws_api_gateway_integration.options_integration,
   ]
 
-  
-  stage_name  = "prod"
+
+  stage_name = "prod"
 }
