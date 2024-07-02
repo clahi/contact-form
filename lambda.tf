@@ -21,35 +21,32 @@ resource "aws_iam_role" "lambdaRole" {
 resource "aws_iam_policy" "lambdaPolicy" {
   name = "lambdaPolicy"
   policy = jsonencode({
-  "Version": "2012-10-17",
-  "Statement": [{
-      "Effect": "Allow",
-      "Action": [
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Effect" : "Allow",
+      "Action" : [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "arn:aws:logs:*:*:*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ses:SendEmail",
-        "ses:SendRawEmail"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:PutItem"
-      ],
-      "Resource": "arn:aws:dynamodb:us-east-2:123456789012:table/Contact"
-    }
-  ]
-})
+      "Resource" : "arn:aws:logs:*:*:*"
+      },
+      {
+            "Effect": "Allow",
+            "Action": [
+                "ses:*"
+            ],
+            "Resource": "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:PutItem"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy_attachment" "lambdaRolePolicyAttachment" {
@@ -73,28 +70,18 @@ resource "aws_lambda_function" "lambda" {
   runtime          = "python3.9"
   handler          = "lambda.lambda_handler"
 
-  # environment {
-  #   variables = {
-  #     TABLE_NAME = aws_dynamodb_table.basic-dynamodb-table.name
-  #   }
-  # }
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.basic-dynamodb-table.name
+      SENDER_EMAIL = aws_ses_email_identity.approved_email.email
+    }
+  }
 }
 
 resource "aws_lambda_permission" "lambdaPermission" {
   statement_id  = "lambdaPermission"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda.function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.mySourceBucket.arn
-}
-
-resource "aws_s3_bucket_notification" "bucketNotification" {
-  bucket = aws_s3_bucket.mySourceBucket.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.faceRekognition.arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [aws_lambda_permission.faceRekognitionPermission]
+  principal     = "apigateway.amazonaws.com"
+  source_arn = "${aws_api_gateway_rest_api.ContactFormApi.execution_arn}/*"
 }

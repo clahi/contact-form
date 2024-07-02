@@ -1,12 +1,12 @@
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
-  name           = "Faces"
+  name           = "ContactForm"
   billing_mode   = "PROVISIONED"
   read_capacity  = 5
   write_capacity = 5
-  hash_key       = "key"
+  hash_key       = "id"
 
   attribute {
-    name = "key"
+    name = "id"
     type = "S"
   }
 

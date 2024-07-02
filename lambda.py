@@ -17,6 +17,17 @@ ses = boto3.client('ses', region_name=SES_REGION)
 
 
 def lambda_handler(event, context):
+    # print('When there is nothing', event['httpMethod'])
+    # return {
+    #     "statusCode": 200,
+    #     "headers": {
+    #         'Access-Control-Allow-Methods': "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+    #         'Access-Control-Allow-Headers': "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    #         'Access-Control-Allow-Origin': "'*'",
+    #         # "Content-Type": "application/json"
+    #         },
+    #     "body": str({"id": "hellow world"})
+    # }
     print(event)
     data = json.loads(event['body'])
     print(json.dumps(data))
@@ -37,14 +48,21 @@ def lambda_handler(event, context):
             data['message']
         save_to_dynamodb(data)
         response = send_mail_to_user(data, content)
+        print('the response from sendng the email',response)
     except ClientError as e:
+        print('all the error ', e)
         print(e.response['Error']['Message'])
     else:
         print("Email sent! Message Id:", response['MessageId'])
 
     return {
         "statusCode": 200,
-        "headers": {"Content-Type": "application/json"},
+        "headers": {
+            'Access-Control-Allow-Methods': "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+            'Access-Control-Allow-Headers': "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+            'Access-Control-Allow-Origin': "*",
+            # "Content-Type": "application/json"
+        },
         "body": ""
     }
 
